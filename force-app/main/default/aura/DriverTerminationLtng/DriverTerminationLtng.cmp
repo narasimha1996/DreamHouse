@@ -1,0 +1,95 @@
+<aura:component Controller='DriverTermination' implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="GLOBAL">	
+   <aura:attribute name='selectedLookUpRecord' type='Driver_Termination_Request__c' default='{}' />
+        <aura:attribute name="isopen" type="boolean" default="false"/>
+     <aura:attribute name="displaySuccess" type="boolean" default="false"/>
+     <aura:attribute name="disableTermWasValue" type="boolean" default="true"/>
+     <aura:attribute name="terminationWasValue" type="String"/> 
+     <aura:attribute name="ReasonforTermination" type="String"/>
+   <!--	 <aura:attribute name="DriverEmail" type="String"/> -->
+   	 <aura:attribute name="OwnerEmail" type="String"/>
+     <aura:attribute name="displayFailure" type="boolean" default="false"/>
+     <aura:attribute name='newTermRequest' Type='Driver_Termination_Request__c'  default="{ 'sobjectType': 'Driver_Termination_Request__c',
+                                                                                         'Driver_Name__c':' ',
+                                                                                          'Owner_Email__c':'',
+                                                  	                                     'Termination_Was__c':' ',
+                                                                                         'Effective_date__c':' ',
+                                                                                         'Reason_for_Termination_PL__c':' ',
+                                                                                         'Notes__c':' '
+                                                                                         }"/>
+    
+    <div class ='custom-button-1'>
+        <lightning:button class ='slds-custom-button-1' label='clickMe' variant="neutral" title='Driver Termination' onclick='{!c.openUP}'/>    
+    </div>    
+     <aura:if isTrue="{!v.isopen}">
+           <section role="dialog" class="slds-modal slds-fade-in-open" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+            <div class="slds-modal__container"> 
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{!c.closeModel}" alternativeText="close" variant="bare-inverse" class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Driver Termination Request</h2>    
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                      <aura:if isTrue="{!!v.onSuccess}">
+                        <c:customLookup CQLookup="select id,Name from Contact Where"  IconName="standard:contact" label="Driver Name" selectedRecord="{!v.selectedLookUpRecord}"/>
+                    </aura:if>
+                    <lightning:select disabled = "{!v.displaySuccess}"  aura:id = "TerminationWas" name="TerminationWas" label="Termination Was" required="true" onchange="{!c.handleChange}">
+                        <option value="">--</option>
+                        <option value="Voluntary">Voluntary - Employee Decision</option>
+                        <option value="Involuntary">Involuntary - Business Decision</option>
+                    </lightning:select>
+                    
+                    <lightning:select disabled = "{!v.disableTermWasValue}"  aura:id = "ReasonforTermination" name="ReasonforTermination" label="Reason for Termination (To be included on driver notification)" required="true" onchange="{!c.handleChange}" >
+                        <aura:if isTrue="{!v.terminationWasValue == 'Voluntary'}">
+                            <option value="">--</option>
+                            <option value="Didn't enjoy the job">Didn't enjoy the job</option>
+                            <option value="Felt overworked">Felt overworked</option>
+                            <option value="Wanted better pay / benefits">Wanted better pay / benefits</option>
+                            <option value="Scheduling conflict">Scheduling conflict</option>    
+                            <option value="Personal relocation">Personal relocation</option>  
+                            <option value="Long commute to work">Long commute to work</option>  
+                            <option value="Job Abandonment (no reason given)">Job Abandonment (no reason given)</option> 
+                            <option value="Other">Other</option>
+                        </aura:if>
+                        <aura:if isTrue="{!v.terminationWasValue == 'Involuntary'}">
+                            <option value="">--</option>
+                            <option value="Attendance - violation of attendance standards">Attendance - violation of attendance standards</option>
+                            <option value="Performance - violation of job performance standards">Performance - violation of job performance standards</option>
+                            <option value="Behavior - violation of code of conduct standards">Behavior - violation of code of conduct standards</option>
+                            <option value="Route Reductions - reduced need for Drivers">Route Reductions - reduced need for Drivers</option>
+                            <option value="Other">Other</option>
+                        </aura:if>
+                    </lightning:select>
+                   
+                    <lightning:select disabled = "{!v.displaySuccess}"  aura:id = "sendTerminationEmail" name="sendTerminationEmail" label="Send Termination Email" required="true">
+                        <option value="">--</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </lightning:select>
+                    
+                    <lightning:select disabled = "{!v.displaySuccess}"  aura:id = "TerminationRequested" name="TerminationRequested" label="I would like to have the Term Letter for this driver completed by DMGgo" required="true">
+                        <option value="">--</option>
+                        <option value="TRUE">Yes</option>
+                        <option value="FALSE">No</option>
+                       
+                    </lightning:select>
+                    
+                    <lightning:input type="email" aura:id = "OwnerEmail" name="OwnerEmail" label="Owner Email" required="true"/>
+                   <!-- <lightning:input type="email" aura:id = "DriverEmail" name="DriverEmail" label="Driver Email" required="true"/> -->
+                    <lightning:input disabled = "{!v.displaySuccess}" type="Date" aura:id = "expdate" name="expdate" label="Effective Date" required="true"/>
+
+                    <lightning:textarea aura:id="notes" name="notes" disabled = "{!v.displaySuccess}" label="Notes"/>
+                    <br/>
+                    
+                    <aura:if isTrue="{!v.displaySuccess == false}">
+                        <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <button class="slds-button slds-button_destructive" onclick="{!c.closeModel}">Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.handleSubmitClick}">Submit</button>
+                            </footer>
+                    </aura:if>
+                     <aura:if isTrue="{!v.displaySuccess == true}">
+                        <button class="slds-button slds-button_neutral" onclick="{! c.closeModel}">Close</button>
+                    </aura:if>
+                </div>
+            </div>
+        </section>
+    </aura:if>
+</aura:component>

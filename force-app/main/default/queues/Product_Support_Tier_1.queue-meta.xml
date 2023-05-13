@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <doesSendEmailToMembers>false</doesSendEmailToMembers>
+    <email>productsupport2@ursamajorsolar.com</email>
+    <name>Product Support Tier 1</name>
+    <queueMembers>
+        <users>
+            <user>narashimha.p@wise-goat-ql2voh.com</user>
+        </users>
+    </queueMembers>
+    <queueSobject>
+        <sobjectType>Case</sobjectType>
+    </queueSobject>
+</Queue>

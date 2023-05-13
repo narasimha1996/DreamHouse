@@ -1,0 +1,4 @@
+<aura:component >
+    <aura:attribute name="message" type ="String"/>
+    <c:helloMessage message ='You look nice today.'/>
+</aura:component>
